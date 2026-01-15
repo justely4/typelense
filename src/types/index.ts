@@ -65,3 +65,13 @@ export interface TypeLenseConfig {
 	excludePatterns: string[];
 	customDetectors?: MonorepoDetector[];
 }
+
+export interface RunMetadata {
+	timestamp: string;
+	date: string;
+	time: string;
+	directory: string;
+	monorepoType: MonorepoType;
+	packagesScanned: number;
+	totalErrors: number;
+}

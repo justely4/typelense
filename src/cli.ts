@@ -5,7 +5,8 @@ import { Command } from "commander";
 import ora, { type Ora } from "ora";
 import { collectTypeScriptErrors } from "./collectors";
 import { detectMonorepo } from "./detectors";
-import { generateTSV } from "./generators";
+import { generateTSVWithMetadata } from "./generators";
+import type { RunMetadata } from "./types";
 
 const program = new Command();
 
@@ -33,24 +34,16 @@ program
 		"Directory to scan for TypeScript errors",
 		process.cwd(),
 	)
-	.option(
-		"-o, --output <path>",
-		"Output path for the TSV file",
-		"typescript-errors.tsv",
-	)
 	.option("-q, --quiet", "Suppress non-error output", false)
+	.option("-w, --web", "Generate web report", false)
 	.action(
-		async (directory: string, options: { output: string; quiet: boolean }) => {
+		async (directory: string, options: { quiet: boolean; web: boolean }) => {
 			try {
 				const targetDir = path.resolve(directory);
-				const outputPath = path.resolve(options.output);
 
 				if (!options.quiet) {
 					console.log(
-						`${chalk.gray("[DIR]")} Scanning directory: ${chalk.cyan(targetDir)}`,
-					);
-					console.log(
-						`${chalk.gray("[OUT]")} Output file: ${chalk.cyan(outputPath)}\n`,
+						`${chalk.gray("[DIR]")} Scanning directory: ${chalk.cyan(targetDir)}\n`,
 					);
 				}
 
@@ -130,17 +123,42 @@ program
 					}
 				}
 
-				// Generate TSV file
+				// Generate metadata
+				const now = new Date();
+				const metadata: RunMetadata = {
+					timestamp: now.toISOString(),
+					date: now.toISOString().split("T")[0],
+					time: now.toTimeString().split(" ")[0],
+					directory: targetDir,
+					monorepoType: monorepoInfo.type,
+					packagesScanned: monorepoInfo.packages.length,
+					totalErrors: errors.length,
+				};
+
+				// Generate TSV file and metadata
 				const generateSpinner = ora({
-					text: "Generating TSV file",
+					text: "Generating output files",
 					color: "cyan",
 				}).start();
 				activeSpinner = generateSpinner;
-				await generateTSV(errors, outputPath);
+				const outputDir = await generateTSVWithMetadata(
+					errors,
+					metadata,
+					targetDir,
+					options.web,
+				);
 				activeSpinner = null;
 				generateSpinner.succeed(
-					chalk.green("Results saved to: ") + chalk.cyan(outputPath),
+					chalk.green("Results saved to: ") + chalk.cyan(outputDir),
 				);
+
+				if (options.web) {
+					console.log(
+						`\n${chalk.bold("Web report generated!")}\n` +
+							`To preview the report, run:\n` +
+							`${chalk.cyan(`npx serve -s ${path.relative(process.cwd(), outputDir)}`)}\n`,
+					);
+				}
 			} catch (error) {
 				// Don't show error if user interrupted
 				if (interrupted) {
