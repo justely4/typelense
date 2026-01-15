@@ -27,7 +27,11 @@
 		"linter",
 		"type-checking"
 	],
-	"author": "",
+	"author": {
+		"name": "Monawwar Abdullah",
+		"email": "hello@monawwar.io",
+		"url": "https://monawwar.io"
+	},
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.11",
