@@ -173,6 +173,25 @@ Detected by: `lerna.json`
 ### Nx
 Detected by: `nx.json` or `workspace.json`
 
+## Roadmap
+
+Planned features for future releases:
+
+- [ ] **Per-package TSV files** - Generate separate TSV files for each package
+- [ ] **Multiple output formats** - Support JSON and CSV in addition to TSV
+- [ ] **Error severity filtering** - Filter by error, warning, or suggestion
+- [ ] **Watch mode** - Continuous monitoring with incremental updates
+- [ ] **Git integration** - Show errors only in changed files since a commit
+- [ ] **Error statistics** - Summary dashboard with error trends and hotspots
+- [ ] **Custom formatters** - Plugin system for custom output formats
+- [ ] **CI/CD integration** - GitHub Actions, GitLab CI templates
+- [ ] **Configuration file** - `.typelenserc` for project-specific settings
+- [ ] **IDE extensions** - VSCode and other editor integrations
+- [ ] **Incremental mode** - Only re-check modified packages
+- [ ] **Error suppression** - Ignore specific errors by code or pattern
+
+Have a feature request? [Open an issue](https://github.com/monawwar/typelense/issues) on GitHub!
+
 ## Documentation
 
 - **[Architecture](./docs/ARCHITECTURE.md)** - Learn about TypeLense's modular design and how to extend it
