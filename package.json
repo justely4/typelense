@@ -11,7 +11,7 @@
 	},
 	"files": [
 		"dist",
-		"src"
+		"web"
 	],
 	"scripts": {
 		"start": "bun run src/cli.ts",
