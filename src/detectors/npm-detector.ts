@@ -4,7 +4,7 @@
 
 import path from "node:path";
 import fg from "fast-glob";
-import type { PackageInfo } from "../types";
+import type { MonorepoType, PackageInfo } from "../types";
 import { BaseDetector } from "./base-detector";
 
 interface PackageJson {
@@ -14,7 +14,7 @@ interface PackageJson {
 }
 
 export class NpmDetector extends BaseDetector {
-	name = "npm" as const;
+	readonly name: MonorepoType = "npm";
 
 	async detect(rootPath: string): Promise<boolean> {
 		const packageJsonPath = this.resolvePath(rootPath, "package.json");
@@ -69,9 +69,9 @@ export class NpmDetector extends BaseDetector {
 }
 
 export class YarnDetector extends NpmDetector {
-	name = "yarn" as const;
+	override readonly name = "yarn" as const;
 
-	async detect(rootPath: string): Promise<boolean> {
+	override async detect(rootPath: string): Promise<boolean> {
 		const hasWorkspaces = await super.detect(rootPath);
 		const hasYarnLock = this.fileExists(
 			this.resolvePath(rootPath, "yarn.lock"),

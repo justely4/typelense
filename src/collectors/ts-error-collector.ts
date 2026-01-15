@@ -41,6 +41,8 @@ export class TypeScriptErrorCollector implements ErrorCollector {
 					}
 
 					const pkg = monorepoInfo.packages[i];
+					if (!pkg) continue;
+
 					onProgress?.(pkg.name, i + 1, total);
 
 					// Yield to event loop to allow spinner to update

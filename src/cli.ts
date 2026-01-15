@@ -108,7 +108,7 @@ program
 								if (!acc[error.packageName]) {
 									acc[error.packageName] = [];
 								}
-								acc[error.packageName].push(error);
+								acc[error.packageName]?.push(error);
 								return acc;
 							},
 							{} as Record<string, typeof errors>,
