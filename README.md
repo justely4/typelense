@@ -17,44 +17,40 @@ A modular and scalable TypeScript error collector for monorepos. TypeLense autom
 - **Beautiful CLI**: Color-coded output with ASCII icons and progress indicators
 - **Zero Config**: Works out of the box with sensible defaults
 
-## Installation
-
-### Using Bun (Recommended)
-
-```bash
-bun install typelense
-```
-
-### Using NPM/PNPM/Yarn
-
-```bash
-npm install typelense
-# or
-pnpm add typelense
-# or
-yarn add typelense
-```
-
 ## Usage
+
+No installation required! Run TypeLense directly using `npx`:
 
 ### Basic Usage
 
 Run in the current directory:
 
 ```bash
-typelense
+npx typelense
 ```
 
 Run in a specific directory:
 
 ```bash
-typelense /path/to/monorepo
+npx typelense /path/to/monorepo
+```
+
+### With Bun
+
+```bash
+bunx typelense
+```
+
+### With PNPM
+
+```bash
+pnpm dlx typelense
 ```
 
 ### CLI Options
 
 ```bash
-typelense [directory] [options]
+npx typelense [directory] [options]
 ```
 
 **Options:**
@@ -68,16 +64,46 @@ typelense [directory] [options]
 
 ```bash
 # Scan current directory and save to default file
-typelense
+npx typelense
 
 # Scan specific directory with custom output
-typelense ./my-monorepo -o errors.tsv
+npx typelense ./my-monorepo -o errors.tsv
 
 # Run in quiet mode
-typelense -q
+npx typelense -q
 
 # Scan parent directory
-typelense ..
+npx typelense ..
+
+# Using Bun
+bunx typelense
+
+# Using PNPM
+pnpm dlx typelense
+```
+
+## Installation (Optional)
+
+If you want to install TypeLense globally:
+
+```bash
+# Using NPM
+npm install -g typelense
+
+# Using Bun
+bun install -g typelense
+
+# Using PNPM
+pnpm add -g typelense
+
+# Using Yarn
+yarn global add typelense
+```
+
+Then run directly:
+
+```bash
+typelense /path/to/project
 ```
 
 ## Output Format
@@ -147,80 +173,10 @@ Detected by: `lerna.json`
 ### Nx
 Detected by: `nx.json` or `workspace.json`
 
-## Architecture
+## Documentation
 
-TypeLense is built with a modular, scalable architecture:
-
-```
-src/
-├── types/           # TypeScript interfaces and types
-├── detectors/       # Monorepo detection plugins
-│   ├── base-detector.ts
-│   ├── pnpm-detector.ts
-│   ├── npm-detector.ts
-│   ├── yarn-detector.ts
-│   ├── lerna-detector.ts
-│   ├── nx-detector.ts
-│   └── turbo-detector.ts
-├── collectors/      # Error collection logic
-│   └── ts-error-collector.ts
-└── generators/      # Output format generators
-    └── tsv-generator.ts
-```
-
-### Extending TypeLense
-
-Add custom detectors by implementing the `MonorepoDetector` interface:
-
-```typescript
-import { BaseDetector, PackageInfo } from 'typelense';
-
-export class CustomDetector extends BaseDetector {
-  name = 'custom' as const;
-
-  async detect(rootPath: string): Promise<boolean> {
-    // Your detection logic
-    return this.fileExists(this.resolvePath(rootPath, 'custom.config'));
-  }
-
-  async getPackages(rootPath: string): Promise<PackageInfo[]> {
-    // Your package discovery logic
-    return [];
-  }
-}
-```
-
-## Development
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/typelense.git
-cd typelense
-
-# Install dependencies
-bun install
-```
-
-### Running Locally
-
-```bash
-# Run the CLI
-bun run start
-
-# Run with hot reload
-bun run dev
-
-# Run on a specific directory
-bun run start /path/to/test
-```
-
-### Building
-
-```bash
-bun run build
-```
+- **[Architecture](./docs/ARCHITECTURE.md)** - Learn about TypeLense's modular design and how to extend it
+- **[Contributing](./CONTRIBUTING.md)** - Guidelines for contributing to the project
 
 ## Requirements
 
@@ -229,8 +185,8 @@ bun run build
 
 ## License
 
-MIT
+MIT - See [LICENSE](./LICENSE) file for details
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guide](./docs/CONTRIBUTING.md) to get started.
