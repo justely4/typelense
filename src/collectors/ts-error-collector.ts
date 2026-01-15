@@ -9,46 +9,93 @@ import type { ErrorCollector, MonorepoInfo, TypeScriptError } from "../types";
 
 export class TypeScriptErrorCollector implements ErrorCollector {
 	private errorIdCounter = 0;
+	private interrupted = false;
 
 	async collect(
 		rootPath: string,
 		monorepoInfo: MonorepoInfo,
+		onProgress?: (packageName: string, current: number, total: number) => void,
 	): Promise<TypeScriptError[]> {
 		const allErrors: TypeScriptError[] = [];
 		this.errorIdCounter = 0; // Reset counter for each collection
+		this.interrupted = false;
 
-		if (monorepoInfo.packages.length === 0) {
-			// No packages found, try to check root directory
-			const errors = await this.collectFromPath(rootPath, "root");
-			allErrors.push(...errors);
-		} else {
-			// Collect errors from each package
-			for (const pkg of monorepoInfo.packages) {
-				const errors = await this.collectFromPath(pkg.path, pkg.name);
+		// Listen for interruption
+		const interruptHandler = () => {
+			this.interrupted = true;
+		};
+		process.on("SIGINT", interruptHandler);
+
+		try {
+			if (monorepoInfo.packages.length === 0) {
+				// No packages found, try to check root directory
+				onProgress?.("root", 1, 1);
+				const errors = await this.collectFromPath(rootPath, "root");
 				allErrors.push(...errors);
-			}
-		}
+			} else {
+				// Collect errors from each package
+				const total = monorepoInfo.packages.length;
+				for (let i = 0; i < monorepoInfo.packages.length; i++) {
+					if (this.interrupted) {
+						throw new Error("Interrupted by user");
+					}
 
-		return allErrors;
+					const pkg = monorepoInfo.packages[i];
+					onProgress?.(pkg.name, i + 1, total);
+					const errors = await this.collectFromPath(pkg.path, pkg.name);
+					allErrors.push(...errors);
+				}
+			}
+
+			return allErrors;
+		} finally {
+			process.off("SIGINT", interruptHandler);
+		}
 	}
 
 	private async collectFromPath(
 		packagePath: string,
 		packageName: string,
 	): Promise<TypeScriptError[]> {
+		if (this.interrupted) {
+			return [];
+		}
+
 		const tsconfigPath = this.findTsConfig(packagePath);
 
 		if (!tsconfigPath) {
-			console.warn(
-				`  ⚠ No tsconfig.json found for ${packageName}, skipping...`,
-			);
+			// Don't warn in quiet mode or if interrupted
+			if (!this.interrupted) {
+				console.warn(
+					`  ⚠ No tsconfig.json found for ${packageName}, skipping...`,
+				);
+			}
 			return [];
 		}
 
 		try {
-			return this.collectErrorsFromProject(tsconfigPath, packageName);
+			// Run in next tick to allow interruption
+			return await new Promise<TypeScriptError[]>((resolve, reject) => {
+				setImmediate(() => {
+					if (this.interrupted) {
+						resolve([]);
+						return;
+					}
+					try {
+						const errors = this.collectErrorsFromProject(
+							tsconfigPath,
+							packageName,
+						);
+						resolve(errors);
+					} catch (err) {
+						reject(err);
+					}
+				});
+			});
 		} catch (error) {
-			console.error(`  ✗ Error collecting from ${packageName}:`, error);
+			if (!this.interrupted) {
+				console.error(`  ✗ Error collecting from ${packageName}:`, error);
+			}
 			return [];
 		}
 	}
@@ -147,7 +194,8 @@ export class TypeScriptErrorCollector implements ErrorCollector {
 export async function collectTypeScriptErrors(
 	rootPath: string,
 	monorepoInfo: MonorepoInfo,
+	onProgress?: (packageName: string, current: number, total: number) => void,
 ): Promise<TypeScriptError[]> {
 	const collector = new TypeScriptErrorCollector();
-	return collector.collect(rootPath, monorepoInfo);
+	return collector.collect(rootPath, monorepoInfo, onProgress);
 }

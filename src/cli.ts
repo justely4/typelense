@@ -9,6 +9,21 @@ import { generateTSV } from "./generators";
 
 const program = new Command();
 
+// Handle Ctrl+C gracefully
+let interrupted = false;
+let activeSpinner: any = null;
+
+process.on("SIGINT", () => {
+	if (!interrupted) {
+		interrupted = true;
+		if (activeSpinner) {
+			activeSpinner.stop();
+		}
+		console.log(chalk.yellow("\n\n⚠ Interrupted by user"));
+		process.exit(130);
+	}
+});
+
 program
 	.name("typelense")
 	.description("TypeScript error collector for monorepos")
@@ -44,39 +59,38 @@ program
 					text: "Detecting monorepo configuration",
 					color: "cyan",
 				}).start();
+				activeSpinner = detectSpinner;
 				const monorepoInfo = await detectMonorepo(targetDir);
+				activeSpinner = null;
 
 				if (monorepoInfo.isMonorepo) {
 					detectSpinner.succeed(
 						chalk.green("Detected ") +
 							chalk.bold.blue(monorepoInfo.type) +
 							chalk.green(
-								` monorepo with ${monorepoInfo.packages.length} package(s)`,
+								` monorepo with ${chalk.bold(monorepoInfo.packages.length)} package(s)`,
 							),
 					);
-
-					if (!options.quiet && monorepoInfo.packages.length > 0) {
-						console.log(chalk.dim("  Packages:"));
-						for (const pkg of monorepoInfo.packages) {
-							console.log(
-								chalk.dim("    *") +
-									" " +
-									chalk.blue(pkg.name) +
-									(pkg.version ? chalk.gray(` (${pkg.version})`) : ""),
-							);
-						}
-						console.log();
-					}
 				} else {
 					detectSpinner.succeed(chalk.green("Single package detected"));
 				}
 
-				// Collect TypeScript errors
+				// Collect TypeScript errors with progress
 				const collectSpinner = ora({
 					text: "Collecting TypeScript errors",
 					color: "cyan",
 				}).start();
-				const errors = await collectTypeScriptErrors(targetDir, monorepoInfo);
+				activeSpinner = collectSpinner;
+
+				const errors = await collectTypeScriptErrors(
+					targetDir,
+					monorepoInfo,
+					(packageName, current, total) => {
+						if (interrupted) return;
+						collectSpinner.text = `Processing ${chalk.blue(packageName)} (${current}/${total})`;
+					},
+				);
+				activeSpinner = null;
 
 				if (errors.length === 0) {
 					collectSpinner.succeed(chalk.green("No TypeScript errors found"));
@@ -121,13 +135,30 @@ program
 					text: "Generating TSV file",
 					color: "cyan",
 				}).start();
+				activeSpinner = generateSpinner;
 				await generateTSV(errors, outputPath);
+				activeSpinner = null;
 				generateSpinner.succeed(
 					chalk.green("Results saved to: ") + chalk.cyan(outputPath),
 				);
 			} catch (error) {
+				// Don't show error if user interrupted
+				if (interrupted) {
+					process.exit(130);
+				}
+
 				const errorMessage =
 					error instanceof Error ? error.message : String(error);
+
+				// Handle interrupted error gracefully
+				if (errorMessage.includes("Interrupted by user")) {
+					console.log(chalk.yellow("\n⚠ Interrupted by user"));
+					process.exit(130);
+				}
+
+				if (activeSpinner) {
+					activeSpinner.stop();
+				}
 				ora().fail(chalk.red("Error: ") + errorMessage);
 				process.exit(1);
 			}
